@@ -4,3 +4,5 @@ repositório git
 Arquivo modificado novamente
 
 Arquivo modificado na branch newBranch
+
+Agora com tag
