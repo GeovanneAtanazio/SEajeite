@@ -2,3 +2,5 @@ Meu primeiro arquivo txt no
 repositório git
 
 Arquivo modificado novamente
+
+Arquivo modificado na branch newBranch
