@@ -17,9 +17,9 @@ environment:
   sdk: ">=2.1.0 <3.0.0"
 
 dependencies:
-  dio: ^3.0.7
   rxdart: ^0.22.6
   bloc_pattern: ^2.5.1
+  screen_state: ^0.1.1
   flutter:
     sdk: flutter
 

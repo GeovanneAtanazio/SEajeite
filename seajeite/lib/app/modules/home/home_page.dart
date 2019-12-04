@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:screen_state/screen_state.dart';
 import 'package:seajeite/app/components/custom_timer_painter.dart';
 
 class HomePage extends StatefulWidget {
@@ -16,17 +19,42 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    startListening();
     controller = AnimationController(
       vsync: this,
       duration: Duration(minutes: 10),
     );
   }
 
+  Screen _screen;
+  StreamSubscription<ScreenStateEvent> _subscription;
+
+  void onData(ScreenStateEvent event) {
+    start = DateTime.now();
+    if (event == ScreenStateEvent.SCREEN_ON) {
+      controller.reset();
+      controller.reverse(
+        from: controller.value == 0.0 ? 1.0 : controller.value,
+      );
+    }
+  }
+
+  void startListening() {
+    _screen = new Screen();
+    try {
+      _subscription = _screen.screenStateStream.listen(onData);
+    } on ScreenStateException catch (exception) {
+      print(exception);
+    }
+  }
+
   String getTimer() {
     int secs = DateTime.now().difference(start).inSeconds;
     String minutes = (secs / 60 - 0.499).round().toString();
     String seconds = (secs % 60).toString();
-    return (minutes.length < 2 ? "0" + minutes : minutes) + ":" + (seconds.length < 2 ? "0" + seconds : seconds);
+    return (minutes.length < 2 ? "0" + minutes : minutes) +
+        ":" +
+        (seconds.length < 2 ? "0" + seconds : seconds);
   }
 
   @override
@@ -104,7 +132,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   animation: controller,
                   builder: (context, child) {
                     return FloatingActionButton.extended(
-                      backgroundColor: Colors.lightBlue,
+                      backgroundColor: Colors.blueGrey,
                       onPressed: () {
                         if (controller.isAnimating) {
                           controller.reset();
