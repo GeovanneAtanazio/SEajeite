@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:screen_state/screen_state.dart';
 import 'package:seajeite/app/components/custom_timer_painter.dart';
 
+import '../../app_bloc.dart';
+import '../../app_module.dart';
+
 class HomePage extends StatefulWidget {
   final String title;
   const HomePage({Key key, this.title = "Seajeite"}) : super(key: key);
@@ -15,14 +18,19 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   AnimationController controller;
   DateTime start = DateTime.now();
+  final _appBloc = AppModule.to.getBloc<AppBloc>();
 
   @override
   void initState() {
     super.initState();
+    _appBloc.initBloc();
     startListening();
     controller = AnimationController(
       vsync: this,
-      duration: Duration(minutes: 10),
+      duration: Duration(seconds: 30),
+    );
+    controller.reverse(
+      from: controller.value == 0.0 ? 1.0 : controller.value,
     );
   }
 
@@ -51,6 +59,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   String getTimer() {
     int secs = DateTime.now().difference(start).inSeconds;
     String minutes = (secs / 60 - 0.499).round().toString();
+    if ((secs % 60) >= 30) {
+      _appBloc.notify((secs / 60 - 0.499).round(), "Seajeite",
+          "Arruma essa postura, seu arrombado!");
+      start = DateTime.now();
+      controller.reset();
+      controller.reverse(
+        from: controller.value == 0.0 ? 1.0 : controller.value,
+      );
+    }
     String seconds = (secs % 60).toString();
     return (minutes.length < 2 ? "0" + minutes : minutes) +
         ":" +
@@ -148,7 +165,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       icon: Icon(
                         controller.isAnimating ? Icons.stop : Icons.play_arrow,
                       ),
-                      label: Text(controller.isAnimating ? "Parar" : "Começar"),
+                      label: Text(controller.isAnimating ? "Parar" : "Iniciar"),
                     );
                   },
                 ),
