@@ -17,6 +17,7 @@ environment:
   sdk: ">=2.1.0 <3.0.0"
 
 dependencies:
+  workmanager: ^0.1.5
   rxdart: ^0.22.6
   bloc_pattern: ^2.5.1
   screen_state: ^0.1.1
