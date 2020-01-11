@@ -1,10 +1,11 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:seajeite/app/util/constants.dart';
 
-class Notifier {
+class LocalNotifier {
   FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin;
   NotificationDetails _pltfrmChnlSpc;
 
-  init() {
+  void init() {
     _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
     var initializationSettingsAndroid =
         AndroidInitializationSettings('app_icon');
@@ -14,9 +15,9 @@ class Notifier {
     _flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
     var ndrdChnlSpc = AndroidNotificationDetails(
-      'seajeite',
-      'Seajeite',
-      'Lembrete de correção postural',
+      APP_TITLE.toLowerCase(),
+      APP_TITLE,
+      DESCRIPTION_NOTIFY_CHN,
       importance: Importance.Max,
       priority: Priority.High,
     );
@@ -24,21 +25,21 @@ class Notifier {
     _pltfrmChnlSpc = NotificationDetails(ndrdChnlSpc, iOSChnlSpc);
   }
 
-  cancel() async {
+  void cancel() async {
     await _flutterLocalNotificationsPlugin.cancelAll();
   }
 
-  notifyPeriodic(Duration duration, String title, String body) async {
+  void notifyPeriodic(Duration duration, String title, String body) async {
     var time = DateTime.now();
-    for (var i = 0; i < 5; i++) {
+    for (var i = 1; i < NOTIFY_TIMES; i++) {
       time = time.add(duration);
       await _flutterLocalNotificationsPlugin.schedule(
-          (time.millisecondsSinceEpoch / 1000).round(),
-          title,
-          body,
-          time,
-          _pltfrmChnlSpc);
-      print((time.millisecondsSinceEpoch / 1000).round().toString());
+        (time.millisecondsSinceEpoch / 1000).round(),
+        title,
+        body,
+        time,
+        _pltfrmChnlSpc,
+      );
     }
   }
 }
