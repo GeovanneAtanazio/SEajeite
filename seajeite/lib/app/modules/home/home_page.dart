@@ -1,71 +1,49 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:screen_state/screen_state.dart';
+
 import 'package:seajeite/app/components/custom_timer_painter.dart';
-import 'package:seajeite/app/util/notifier.dart';
+import 'package:seajeite/app/modules/home/home_module.dart';
+import 'package:seajeite/app/util/constants.dart';
+
+import 'home_bloc.dart';
 
 class HomePage extends StatefulWidget {
   final String title;
-  const HomePage({Key key, this.title = "Seajeite"}) : super(key: key);
+  const HomePage({Key key, this.title = APP_TITLE}) : super(key: key);
 
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
+  final _bloc = HomeModule.to.getBloc<HomeBloc>();
   AnimationController controller;
-  DateTime start = DateTime.now();
-  var notifier = Notifier();
 
   @override
   void initState() {
     super.initState();
-    startListening();
+    _bloc.startListening(onData);
     controller = AnimationController(
       vsync: this,
-      duration: Duration(minutes: 6),
+      duration: Duration(minutes: NOTIFY_TIMES * NOTIFY_INTERVAL),
     );
     controller.reverse(
       from: controller.value == 0.0 ? 1.0 : controller.value,
     );
   }
 
-  Screen _screen;
-  StreamSubscription<ScreenStateEvent> _subscription;
-
   void onData(ScreenStateEvent event) {
-    start = DateTime.now();
     if (event == ScreenStateEvent.SCREEN_ON) {
+      _bloc.start = DateTime.now();
       controller.reset();
       controller.reverse(
         from: controller.value == 0.0 ? 1.0 : controller.value,
       );
-    }
-  }
 
-  void startListening() {
-    notifier.init();
-    _screen = new Screen();
-    try {
-      _subscription = _screen.screenStateStream.listen(onData);
-    } on ScreenStateException catch (exception) {
-      print(exception);
+      _bloc.setNotifications(
+        Duration(minutes: NOTIFY_INTERVAL),
+      );
     }
-  }
-
-  String getTimer() {
-    int secs = DateTime.now().difference(start).inSeconds;
-    int minutes = (secs / 60 - 0.499).round();
-    if (minutes > 60) {
-      notifier.cancel();
-    }
-    String seconds = (secs % 60).toString();
-    return (minutes.toString().length < 2
-            ? "0" + minutes.toString()
-            : minutes.toString()) +
-        ":" +
-        (seconds.length < 2 ? "0" + seconds : seconds);
   }
 
   @override
@@ -83,91 +61,98 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                Expanded(
-                  child: Align(
-                    alignment: FractionalOffset.center,
-                    child: AspectRatio(
-                      aspectRatio: 1.0,
-                      child: Stack(
-                        children: <Widget>[
-                          Positioned.fill(
-                            child: AnimatedBuilder(
-                              animation: controller,
-                              builder: (BuildContext context, Widget child) {
-                                return CustomPaint(
-                                  painter: CustomTimerPainter(
-                                    animation: controller,
-                                    backgroundColor: Colors.blueGrey,
-                                    color: Colors.lightBlue,
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                          Align(
-                            alignment: FractionalOffset.center,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: <Widget>[
-                                Text(
-                                  "\n\nTEMPO DE ATIVIDADE",
-                                  style: TextStyle(
-                                    fontSize: 20.0,
-                                    color: Colors.lightBlue,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                AnimatedBuilder(
-                                  animation: controller,
-                                  builder:
-                                      (BuildContext context, Widget child) {
-                                    return Text(
-                                      getTimer(),
-                                      style: TextStyle(
-                                        fontSize: 28.0,
-                                        color: Colors.lightBlue,
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                AnimatedBuilder(
-                  animation: controller,
-                  builder: (context, child) {
-                    return FloatingActionButton.extended(
-                      backgroundColor: Colors.blueGrey,
-                      onPressed: () {
-                        if (controller.isAnimating) {
-                          controller.reset();
-                          notifier.cancel();
-                        } else {
-                          start = DateTime.now();
-                          controller.reverse(
-                            from: controller.value == 0.0
-                                ? 1.0
-                                : controller.value,
-                          );
-                        }
-                      },
-                      icon: Icon(
-                        controller.isAnimating ? Icons.stop : Icons.play_arrow,
-                      ),
-                      label: Text(controller.isAnimating ? "Parar" : "Iniciar"),
-                    );
-                  },
-                ),
+                buildExpandedTimer(),
+                buildAnimatedController(),
               ],
             ),
           );
         },
+      ),
+    );
+  }
+
+  AnimatedBuilder buildAnimatedController() {
+    return AnimatedBuilder(
+      animation: controller,
+      builder: (context, child) {
+        return FloatingActionButton.extended(
+          backgroundColor: Colors.blueGrey,
+          onPressed: () {
+            if (controller.isAnimating) {
+              controller.reset();
+              _bloc.cancelNotifications();
+            } else {
+              _bloc.start = DateTime.now();
+              controller.reverse(
+                from: controller.value == 0.0 ? 1.0 : controller.value,
+              );
+            }
+          },
+          icon: Icon(
+            controller.isAnimating ? Icons.stop : Icons.play_arrow,
+          ),
+          label: Text(
+            controller.isAnimating ? DESCRIPTION_STOP : DESCRIPTION_START,
+          ),
+        );
+      },
+    );
+  }
+
+  Expanded buildExpandedTimer() {
+    return Expanded(
+      child: Align(
+        alignment: FractionalOffset.center,
+        child: AspectRatio(
+          aspectRatio: 1.0,
+          child: Stack(
+            children: <Widget>[
+              Positioned.fill(
+                child: AnimatedBuilder(
+                  animation: controller,
+                  builder: (BuildContext context, Widget child) {
+                    return CustomPaint(
+                      painter: CustomTimerPainter(
+                        animation: controller,
+                        backgroundColor: Colors.blueGrey,
+                        color: Colors.lightBlue,
+                      ),
+                    );
+                  },
+                ),
+              ),
+              Align(
+                alignment: FractionalOffset.center,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Text(
+                      "\n\n$DESCRIPTION_ACTIVITY_TIME",
+                      style: TextStyle(
+                        fontSize: 20.0,
+                        color: Colors.lightBlue,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    AnimatedBuilder(
+                      animation: controller,
+                      builder: (BuildContext context, Widget child) {
+                        return Text(
+                          _bloc.getTimer(),
+                          style: TextStyle(
+                            fontSize: 28.0,
+                            color: Colors.lightBlue,
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
