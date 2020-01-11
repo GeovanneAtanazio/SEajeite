@@ -82,6 +82,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               controller.reset();
               _bloc.cancelNotifications();
             } else {
+              _bloc.startListening(onData);
               _bloc.start = DateTime.now();
               controller.reverse(
                 from: controller.value == 0.0 ? 1.0 : controller.value,

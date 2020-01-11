@@ -12,6 +12,12 @@ class HomeBloc extends BlocBase {
   void startListening(onData) {
     notifier.init();
     _screen = new Screen();
+
+    cancelNotifications();
+    setNotifications(
+      Duration(minutes: NOTIFY_INTERVAL),
+    );
+
     try {
       _screen.screenStateStream.listen(onData);
     } on ScreenStateException catch (e) {
