@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:screen_state/screen_state.dart';
+import 'package:seajeite/app/util/lifecycle_event_handler.dart';
 
-import 'package:seajeite/app/components/custom_timer_painter.dart';
+import './components/custom_timer_painter.dart';
 import 'package:seajeite/app/modules/home/home_module.dart';
 import 'package:seajeite/app/util/constants.dart';
 
@@ -15,35 +16,128 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
+class _HomePageState extends State<HomePage>
+    with TickerProviderStateMixin, WidgetsBindingObserver {
   final _bloc = HomeModule.to.getBloc<HomeBloc>();
   AnimationController controller;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(LifecycleEventHandler(
+      suspendingCallBack: () async => _bloc.cancelNotifications(),
+    ));
     _bloc.startListening(onData);
     controller = AnimationController(
       vsync: this,
-      duration: Duration(minutes: NOTIFY_TIMES * NOTIFY_INTERVAL),
+      duration: Duration(
+        seconds:
+            _bloc.tupleNotSetting.interval * _bloc.tupleNotSetting.qtdLimit,
+      ),
     );
     controller.reverse(
       from: controller.value == 0.0 ? 1.0 : controller.value,
     );
   }
 
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
   void onData(ScreenStateEvent event) {
     if (event == ScreenStateEvent.SCREEN_ON) {
-      _bloc.start = DateTime.now();
+      _bloc.restartTime();
       controller.reset();
       controller.reverse(
         from: controller.value == 0.0 ? 1.0 : controller.value,
       );
 
-      _bloc.setNotifications(
-        Duration(minutes: NOTIFY_INTERVAL),
-      );
+      _bloc.setNotifications(_bloc.tupleNotSetting.interval);
     }
+  }
+
+  showSettingsDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Container(
+            height: 240,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Container(
+                  child: Text(
+                    "Configurar Notificações",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  margin: EdgeInsets.only(bottom: 30),
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text("Tempo de intervalo"),
+                    StreamBuilder<double>(
+                      stream: _bloc.outIntervalValue,
+                      initialData: 10,
+                      builder: (context, snapshot) {
+                        return Slider(
+                          onChanged: _bloc.setIntervalValue,
+                          value: snapshot.data,
+                          divisions: 5,
+                          min: 10,
+                          max: 60,
+                          label: '${snapshot.data.toInt()} minutos',
+                        );
+                      },
+                    ),
+                    Text("Quantidade limite"),
+                    StreamBuilder<double>(
+                      stream: _bloc.outQtdLimitValue,
+                      initialData: 1,
+                      builder: (context, snapshot) {
+                        return Slider(
+                          onChanged: _bloc.setQtdLimitValue,
+                          value: snapshot.data,
+                          divisions: 11,
+                          min: 1,
+                          max: 12,
+                          label: '${snapshot.data.toInt()} notificações',
+                        );
+                      },
+                    ),
+                  ],
+                ),
+                FlatButton(
+                  textColor: Colors.blueGrey,
+                  onPressed: () async {
+                    await _bloc.saveNotificationSetting();
+                    await _bloc.cancelNotifications();
+                    _bloc.setNotifications(_bloc.tupleNotSetting.interval);
+                    _bloc.restartTime();
+                    Navigator.of(context).pop();
+                    controller.duration = Duration(
+                      seconds: _bloc.tupleNotSetting.interval *
+                          _bloc.tupleNotSetting.qtdLimit,
+                    );
+                    controller.reset();
+                    controller.reverse(
+                      from: controller.value == 0.0 ? 1.0 : controller.value,
+                    );
+                  },
+                  child: Text("OK"),
+                )
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -52,6 +146,20 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       appBar: AppBar(
         title: Text(widget.title),
         centerTitle: true,
+        actions: <Widget>[
+          GestureDetector(
+            child: Container(
+              child: Icon(
+                Icons.settings,
+              ),
+              margin: EdgeInsets.only(right: 10),
+            ),
+            onTap: () async {
+              await _bloc.getNotificationSetting();
+              showSettingsDialog();
+            },
+          ),
+        ],
       ),
       body: AnimatedBuilder(
         animation: controller,
