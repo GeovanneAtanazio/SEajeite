@@ -58,6 +58,45 @@ class _HomePageState extends State<HomePage>
     }
   }
 
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title),
+        centerTitle: true,
+        actions: <Widget>[
+          GestureDetector(
+            child: Container(
+              child: Icon(
+                Icons.settings,
+              ),
+              margin: EdgeInsets.only(right: 10),
+            ),
+            onTap: () async {
+              await _bloc.getNotificationSetting();
+              showSettingsDialog();
+            },
+          ),
+        ],
+      ),
+      body: AnimatedBuilder(
+        animation: controller,
+        builder: (context, child) {
+          return Padding(
+            padding: EdgeInsets.all(30.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                buildExpandedTimer(),
+                buildAnimatedController(),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   showSettingsDialog() {
     showDialog(
       context: context,
@@ -137,45 +176,6 @@ class _HomePageState extends State<HomePage>
           ),
         );
       },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-        centerTitle: true,
-        actions: <Widget>[
-          GestureDetector(
-            child: Container(
-              child: Icon(
-                Icons.settings,
-              ),
-              margin: EdgeInsets.only(right: 10),
-            ),
-            onTap: () async {
-              await _bloc.getNotificationSetting();
-              showSettingsDialog();
-            },
-          ),
-        ],
-      ),
-      body: AnimatedBuilder(
-        animation: controller,
-        builder: (context, child) {
-          return Padding(
-            padding: EdgeInsets.all(30.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                buildExpandedTimer(),
-                buildAnimatedController(),
-              ],
-            ),
-          );
-        },
-      ),
     );
   }
 
