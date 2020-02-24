@@ -1,18 +1,26 @@
+import 'dart:async';
+
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:seajeite/app/util/constants.dart';
+
+import 'package:seajeite/app/shared/util/constants.dart';
 
 class LocalNotifier {
   FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin;
   NotificationDetails _pltfrmChnlSpc;
 
-  void init() {
+  LocalNotifier() {
+    _init();
+  }
+
+  void _init() async {
     _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
     var initializationSettingsAndroid =
         AndroidInitializationSettings('app_icon');
     var initializationSettingsIOS = IOSInitializationSettings();
     var initializationSettings = InitializationSettings(
         initializationSettingsAndroid, initializationSettingsIOS);
-    _flutterLocalNotificationsPlugin.initialize(initializationSettings);
+
+    await _flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
     var ndrdChnlSpc = AndroidNotificationDetails(
       APP_TITLE,
@@ -22,19 +30,20 @@ class LocalNotifier {
       importance: Importance.Max,
       priority: Priority.High,
     );
+
     var iOSChnlSpc = IOSNotificationDetails();
     _pltfrmChnlSpc = NotificationDetails(ndrdChnlSpc, iOSChnlSpc);
   }
 
-  Future<void> cancel() async {
+  Future<void> cancelNotifications() async {
     await _flutterLocalNotificationsPlugin.cancelAll();
   }
 
-  void notifyPeriodic(
+  Future<void> notifyPeriodic(
       int duration, int times, String title, String body) async {
     var time = DateTime.now();
     for (var i = 0; i < times; i++) {
-      time = time.add(Duration(seconds: duration));
+      time = time.add(Duration(minutes: duration));
       await _flutterLocalNotificationsPlugin.schedule(
         (time.millisecondsSinceEpoch / 1000).round(),
         title,

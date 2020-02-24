@@ -1,19 +1,22 @@
-import 'package:seajeite/app/modules/home/home_bloc.dart';
-import 'package:bloc_pattern/bloc_pattern.dart';
-import 'package:flutter/material.dart';
+import 'package:seajeite/app/modules/home/home_controller.dart';
+import 'package:flutter_modular/flutter_modular.dart';
 import 'package:seajeite/app/modules/home/home_page.dart';
+import 'package:seajeite/app/shared/preferences/notification_preference.dart';
+import 'package:seajeite/app/shared/util/local_notifier.dart';
 
-class HomeModule extends ModuleWidget {
+class HomeModule extends ChildModule {
   @override
-  List<Bloc> get blocs => [
-        Bloc((i) => HomeBloc()),
+  List<Bind> get binds => [
+        Bind((i) => HomeController(
+              i.get<LocalNotifier>(),
+              i.get<NotificationPreference>(),
+            )),
       ];
 
   @override
-  List<Dependency> get dependencies => [];
-
-  @override
-  Widget get view => HomePage();
+  List<Router> get routers => [
+        Router('/', child: (_, args) => HomePage()),
+      ];
 
   static Inject get to => Inject<HomeModule>.of();
 }

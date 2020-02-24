@@ -1,6 +1,10 @@
 const APP_TITLE = "Seajeite";
 const int NOTIFY_INTERVAL = 10;
 const int NOTIFY_TIMES = 6;
+const double MAX_NOTIFY_INTERVAL = 20;
+const double MIN_NOTIFY_INTERVAL = 1;
+const double MAX_NOTIFY_TIMES = 12;
+const double MIN_NOTIFY_TIMES = 1;
 const NOTIFY_TEXT = "Arruma essa postura, seu arrombado!";
 const DESCRIPTION_NOTIFY_CHN = "Lembrete de correção postural";
 const NAME_NOTIFY_CHN = "Se ajeite";

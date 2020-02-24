@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:seajeite/app/modules/home/home_module.dart';
-import 'package:seajeite/app/util/constants.dart';
+import 'package:flutter_modular/flutter_modular.dart';
+
+import 'package:seajeite/app/shared/util/constants.dart';
 
 class AppWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: Modular.navigatorKey,
       title: APP_TITLE,
       theme: ThemeData(
         primarySwatch: Colors.blueGrey,
       ),
-      home: HomeModule(),
-      debugShowCheckedModeBanner: false,
+      initialRoute: '/',
+      onGenerateRoute: Modular.generateRoute,
     );
   }
 }

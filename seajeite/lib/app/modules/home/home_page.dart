@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:screen_state/screen_state.dart';
-import 'package:seajeite/app/util/lifecycle_event_handler.dart';
+import 'package:flutter_modular/flutter_modular.dart';
 
-import './components/custom_timer_painter.dart';
-import 'package:seajeite/app/modules/home/home_module.dart';
-import 'package:seajeite/app/util/constants.dart';
+import 'package:seajeite/app/shared/util/constants.dart';
+import 'package:seajeite/app/modules/home/components/custom_timer_painter.dart';
 
-import 'home_bloc.dart';
+import 'home_controller.dart';
 
 class HomePage extends StatefulWidget {
   final String title;
@@ -16,46 +16,40 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage>
-    with TickerProviderStateMixin, WidgetsBindingObserver {
-  final _bloc = HomeModule.to.getBloc<HomeBloc>();
-  AnimationController controller;
+class _HomePageState extends ModularState<HomePage, HomeController>
+    with TickerProviderStateMixin {
+  AnimationController _aController;
 
   @override
   void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(LifecycleEventHandler(
-      suspendingCallBack: () async => _bloc.cancelNotifications(),
-    ));
-    _bloc.startListening(onData);
-    controller = AnimationController(
+    controller.startListening(onData);
+    _aController = AnimationController(
       vsync: this,
       duration: Duration(
-        seconds:
-            _bloc.tupleNotSetting.interval * _bloc.tupleNotSetting.qtdLimit,
+        minutes: controller.interval.toInt() * controller.qtdLimit.toInt(),
       ),
     );
-    controller.reverse(
-      from: controller.value == 0.0 ? 1.0 : controller.value,
+    _aController.reverse(
+      from: _aController.value == 0.0 ? 1.0 : _aController.value,
     );
+    super.initState();
   }
 
   @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
+  Future<void> dispose() async {
+    await controller.cancelNotifications();
     super.dispose();
   }
 
-  void onData(ScreenStateEvent event) {
-    if (event == ScreenStateEvent.SCREEN_ON) {
-      _bloc.restartTime();
-      controller.reset();
-      controller.reverse(
-        from: controller.value == 0.0 ? 1.0 : controller.value,
+  Future<void> onData(ScreenStateEvent event) async {
+    if (event == ScreenStateEvent.SCREEN_UNLOCKED) {
+      await controller.setNotifications();
+      _aController.reset();
+      _aController.reverse(
+        from: _aController.value == 0.0 ? 1.0 : _aController.value,
       );
-
-      _bloc.setNotifications(_bloc.tupleNotSetting.interval);
-    }
+    } else if (event == ScreenStateEvent.SCREEN_OFF)
+      await controller.cancelNotifications();
   }
 
   @override
@@ -73,14 +67,14 @@ class _HomePageState extends State<HomePage>
               margin: EdgeInsets.only(right: 10),
             ),
             onTap: () async {
-              await _bloc.getNotificationSetting();
+              await controller.getNotificationSetting();
               showSettingsDialog();
             },
           ),
         ],
       ),
       body: AnimatedBuilder(
-        animation: controller,
+        animation: _aController,
         builder: (context, child) {
           return Padding(
             padding: EdgeInsets.all(30.0),
@@ -121,32 +115,31 @@ class _HomePageState extends State<HomePage>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     Text("Tempo de intervalo"),
-                    StreamBuilder<double>(
-                      stream: _bloc.outIntervalValue,
-                      initialData: 10,
-                      builder: (context, snapshot) {
+                    Observer(
+                      builder: (_) {
                         return Slider(
-                          onChanged: _bloc.setIntervalValue,
-                          value: snapshot.data,
-                          divisions: 5,
-                          min: 10,
-                          max: 60,
-                          label: '${snapshot.data.toInt()} minutos',
+                          onChanged: controller.setInterval,
+                          value: controller.interval,
+                          divisions:
+                              ((MAX_NOTIFY_INTERVAL - MIN_NOTIFY_INTERVAL) / 2)
+                                  .round(),
+                          min: MIN_NOTIFY_INTERVAL,
+                          max: MAX_NOTIFY_INTERVAL,
+                          label: '${controller.interval.toInt()} minutos',
                         );
                       },
                     ),
                     Text("Quantidade limite"),
-                    StreamBuilder<double>(
-                      stream: _bloc.outQtdLimitValue,
-                      initialData: 1,
-                      builder: (context, snapshot) {
+                    Observer(
+                      builder: (_) {
                         return Slider(
-                          onChanged: _bloc.setQtdLimitValue,
-                          value: snapshot.data,
-                          divisions: 11,
-                          min: 1,
-                          max: 12,
-                          label: '${snapshot.data.toInt()} notificações',
+                          onChanged: controller.setQtdLimit,
+                          value: controller.qtdLimit,
+                          divisions: ((MAX_NOTIFY_TIMES - MIN_NOTIFY_TIMES) / 2)
+                              .round(),
+                          min: MIN_NOTIFY_TIMES,
+                          max: MAX_NOTIFY_TIMES,
+                          label: '${controller.qtdLimit.toInt()} notificações',
                         );
                       },
                     ),
@@ -155,19 +148,19 @@ class _HomePageState extends State<HomePage>
                 FlatButton(
                   textColor: Colors.blueGrey,
                   onPressed: () async {
-                    await _bloc.saveNotificationSetting();
-                    await _bloc.cancelNotifications();
-                    _bloc.setNotifications(_bloc.tupleNotSetting.interval);
-                    _bloc.restartTime();
+                    await controller.saveNotificationSetting();
+                    await controller.cancelNotifications();
+                    await controller.setNotifications();
                     Navigator.of(context).pop();
-                    controller.duration = Duration(
-                      seconds: _bloc.tupleNotSetting.interval *
-                          _bloc.tupleNotSetting.qtdLimit,
+                    _aController.duration = Duration(
+                      minutes: controller.interval.toInt() *
+                          controller.qtdLimit.toInt(),
                     );
-                    controller.reset();
-                    controller.reverse(
-                      from: controller.value == 0.0 ? 1.0 : controller.value,
-                    );
+                    _aController.reset();
+                    _aController.reverse(
+                        from: _aController.value == 0.0
+                            ? 1.0
+                            : _aController.value);
                   },
                   child: Text("OK"),
                 )
@@ -181,27 +174,28 @@ class _HomePageState extends State<HomePage>
 
   AnimatedBuilder buildAnimatedController() {
     return AnimatedBuilder(
-      animation: controller,
+      animation: _aController,
       builder: (context, child) {
         return FloatingActionButton.extended(
           backgroundColor: Colors.blueGrey,
-          onPressed: () {
-            if (controller.isAnimating) {
-              controller.reset();
-              _bloc.cancelNotifications();
+          onPressed: () async {
+            if (_aController.isAnimating) {
+              _aController.reset();
+              await controller.cancelNotifications();
             } else {
-              _bloc.startListening(onData);
-              _bloc.start = DateTime.now();
-              controller.reverse(
-                from: controller.value == 0.0 ? 1.0 : controller.value,
+              await controller.startListening(onData);
+              _aController.reset();
+              _aController.reverse(
+                from: _aController.value == 0.0 ? 1.0 : _aController.value,
               );
             }
+            controller.restartTime();
           },
           icon: Icon(
-            controller.isAnimating ? Icons.stop : Icons.play_arrow,
+            _aController.isAnimating ? Icons.stop : Icons.play_arrow,
           ),
           label: Text(
-            controller.isAnimating ? DESCRIPTION_STOP : DESCRIPTION_START,
+            _aController.isAnimating ? DESCRIPTION_STOP : DESCRIPTION_START,
           ),
         );
       },
@@ -218,11 +212,11 @@ class _HomePageState extends State<HomePage>
             children: <Widget>[
               Positioned.fill(
                 child: AnimatedBuilder(
-                  animation: controller,
+                  animation: _aController,
                   builder: (BuildContext context, Widget child) {
                     return CustomPaint(
                       painter: CustomTimerPainter(
-                        animation: controller,
+                        animation: _aController,
                         backgroundColor: Colors.blueGrey,
                         color: Colors.lightBlue,
                       ),
@@ -245,10 +239,12 @@ class _HomePageState extends State<HomePage>
                       ),
                     ),
                     AnimatedBuilder(
-                      animation: controller,
+                      animation: _aController,
                       builder: (BuildContext context, Widget child) {
                         return Text(
-                          _bloc.getTimer(),
+                          _aController.isAnimating
+                              ? controller.getTimer(_aController.reset)
+                              : "00:00",
                           style: TextStyle(
                             fontSize: 28.0,
                             color: Colors.lightBlue,
