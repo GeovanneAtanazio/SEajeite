@@ -1,4 +1,4 @@
-const APP_TITLE = "Seajeite";
+const APP_TITLE = "SeAjeite";
 const int NOTIFY_INTERVAL = 10;
 const int NOTIFY_TIMES = 6;
 const double MAX_NOTIFY_INTERVAL = 20;
