@@ -27,10 +27,10 @@ class ScreenListener {
           await notificationPreference.getNotificationSettings();
       if (notificationSettings != null) {
         notifier.notifyPeriodic(notificationSettings.interval,
-            notificationSettings.qtdLimit, APP_TITLE, NOTIFY_TEXT);
+            notificationSettings.qtdLimit, STR_APP_TITLE, DESCRIPTION_NOTIFY);
       } else {
         notifier.notifyPeriodic(
-            NOTIFY_INTERVAL, NOTIFY_TIMES, APP_TITLE, NOTIFY_TEXT);
+            NOTIFY_INTERVAL, NOTIFY_TIMES, STR_APP_TITLE, DESCRIPTION_NOTIFY);
       }
     }
   }

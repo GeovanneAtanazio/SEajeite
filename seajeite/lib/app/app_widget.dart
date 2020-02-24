@@ -8,7 +8,7 @@ class AppWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       navigatorKey: Modular.navigatorKey,
-      title: APP_TITLE,
+      title: STR_APP_TITLE,
       theme: ThemeData(
         primarySwatch: Colors.blueGrey,
       ),

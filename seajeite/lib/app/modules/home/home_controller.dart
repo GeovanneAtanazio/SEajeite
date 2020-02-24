@@ -85,8 +85,8 @@ abstract class _HomeControllerBase with Store {
     await _notifier.notifyPeriodic(
       interval.toInt(),
       qtdLimit.toInt(),
-      APP_TITLE,
-      NOTIFY_TEXT,
+      STR_APP_TITLE,
+      DESCRIPTION_NOTIFY,
     );
     restartTime();
   }

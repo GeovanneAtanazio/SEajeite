@@ -1,6 +1,5 @@
 import 'package:get_it/get_it.dart';
 import 'package:flutter/material.dart';
-import 'package:seajeite/app/shared/repositories/local_storage/local_storage_shared.dart';
 import 'package:workmanager/workmanager.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 
@@ -8,6 +7,7 @@ import 'package:seajeite/app/app_module.dart';
 import 'package:seajeite/app/shared/util/local_notifier.dart';
 import 'package:seajeite/app/shared/util/screen_listener.dart';
 import 'package:seajeite/app/shared/preferences/notification_preference.dart';
+import 'package:seajeite/app/shared/repositories/local_storage/local_storage_shared.dart';
 
 GetIt getIt = GetIt.I;
 

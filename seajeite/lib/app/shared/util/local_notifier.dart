@@ -23,8 +23,8 @@ class LocalNotifier {
     await _flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
     var ndrdChnlSpc = AndroidNotificationDetails(
-      APP_TITLE,
-      NAME_NOTIFY_CHN,
+      STR_APP_TITLE,
+      STR_APP_TITLE,
       DESCRIPTION_NOTIFY_CHN,
       enableVibration: true,
       importance: Importance.Max,
