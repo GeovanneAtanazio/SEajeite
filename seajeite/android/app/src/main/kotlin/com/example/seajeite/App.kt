@@ -1,4 +1,4 @@
-package com.example.seajeite
+package br.pra.seajeite
 
 import be.tramckrijte.workmanager.WorkmanagerPlugin
 import io.flutter.app.FlutterApplication
