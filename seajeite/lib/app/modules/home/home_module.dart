@@ -1,21 +1,28 @@
-import 'package:seajeite/app/modules/home/home_controller.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:seajeite/app/modules/home/controllers/notifications_controller.dart';
+
+import 'package:seajeite/app/shared/util/routes.dart';
 import 'package:seajeite/app/modules/home/home_page.dart';
-import 'package:seajeite/app/shared/preferences/notification_preference.dart';
 import 'package:seajeite/app/shared/util/local_notifier.dart';
+import 'package:seajeite/app/modules/home/home_controller.dart';
+import 'package:seajeite/app/shared/preferences/notification_preference.dart';
+
+import 'pages/settings_page.dart';
+import 'pages/notifications_page.dart';
 
 class HomeModule extends ChildModule {
   @override
   List<Bind> get binds => [
         Bind((i) => HomeController(
-              i.get<LocalNotifier>(),
-              i.get<NotificationPreference>(),
-            )),
+            i.get<LocalNotifier>(), i.get<NotificationPreference>())),
+        Bind((i) => NotificationsController(i.get<NotificationPreference>())),
       ];
 
   @override
   List<Router> get routers => [
-        Router('/', child: (_, args) => HomePage()),
+        Router(ROUTES.HOME, child: (_, args) => HomePage()),
+        Router(ROUTES.SETTINGS, child: (_, args) => SettingsPage()),
+        Router(ROUTES.NOTIFICATIONS, child: (_, args) => NotificationsPage()),
       ];
 
   static Inject get to => Inject<HomeModule>.of();
