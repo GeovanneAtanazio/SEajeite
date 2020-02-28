@@ -21,7 +21,7 @@ abstract class DialogComponents {
       backgroundColor: backgroundColor ?? Colors.white,
       textColor: textColor ?? Colors.black,
       fontSize: fontSize ?? 16.0,
-      radius: radius ?? 20,
+      radius: radius ?? 45,
       elevation: elevation ?? 10,
     );
   }
