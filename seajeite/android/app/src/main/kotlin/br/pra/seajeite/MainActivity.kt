@@ -1,4 +1,4 @@
-package br.com.seajeite
+package br.pra.seajeite
 
 import android.os.Bundle
 

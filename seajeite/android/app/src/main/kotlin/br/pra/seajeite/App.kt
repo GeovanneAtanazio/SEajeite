@@ -1,4 +1,4 @@
-package br.com.seajeite
+package br.pra.seajeite
 
 import io.flutter.app.FlutterApplication
 import io.flutter.plugin.common.PluginRegistry
