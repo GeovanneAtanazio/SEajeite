@@ -1,6 +1,5 @@
-package br.pra.seajeite
+package br.com.seajeite
 
-import be.tramckrijte.workmanager.WorkmanagerPlugin
 import io.flutter.app.FlutterApplication
 import io.flutter.plugin.common.PluginRegistry
 import io.flutter.plugins.GeneratedPluginRegistrant
@@ -8,7 +7,6 @@ import io.flutter.plugins.GeneratedPluginRegistrant
 class App : FlutterApplication(), PluginRegistry.PluginRegistrantCallback {
     override fun onCreate() {
         super.onCreate()
-        WorkmanagerPlugin.setPluginRegistrantCallback(this)
     }
 
     override fun registerWith(reg: PluginRegistry?) {
