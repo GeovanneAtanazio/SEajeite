@@ -22,10 +22,11 @@ dependencies:
   mobx: ^1.0.2
   dio: ^3.0.8
   flutter_local_notifications: ^0.8.2
-  shared_preferences: ^0.5.6+2
-  screen_state: ^0.1.1
   flutter_flexible_toast: ^0.1.4
-  workmanager: ^0.1.5
+  shared_preferences: ^0.5.6
+  google_sign_in: ^4.1.1
+  firebase_auth: ^0.15.4
+  screen_state: ^0.1.1
   get_it: ^3.1.0
   meta: ^1.1.8
   flutter:

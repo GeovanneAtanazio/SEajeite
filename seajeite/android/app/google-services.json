@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "338307864008",
+    "firebase_url": "https://seajeite.firebaseio.com",
+    "project_id": "seajeite",
+    "storage_bucket": "seajeite.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:338307864008:android:03b3b2b52b20ed3169dcfd",
+        "android_client_info": {
+          "package_name": "br.pra.seajeite"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "338307864008-d56j3cratk0nuh8r7qo31puptp82vjl7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "br.pra.seajeite",
+            "certificate_hash": "fb5cd6b7f9fc8e424f0c0805e0dab4f8afcc6d1f"
+          }
+        },
+        {
+          "client_id": "338307864008-aqehiu2lqbbs11na3cm1mq2aprb7op15.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCS8wtBdYW0QpAKfIBrQajjk2A6qCgulak"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "338307864008-aqehiu2lqbbs11na3cm1mq2aprb7op15.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
