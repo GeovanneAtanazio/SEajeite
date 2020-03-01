@@ -14,12 +14,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends ModularState<HomePage, HomeController> {
   @override
-  Future<void> dispose() async {
-    await controller.cancelNotifications();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
@@ -53,9 +47,9 @@ class _HomePageState extends ModularState<HomePage, HomeController> {
       backgroundColor: Colors.blueGrey,
       onPressed: () async {
         if (controller.isNotifySet) {
-          await controller.cancelNotifications();
+          await controller.stopScreenListener();
         } else {
-          await controller.setNotifications();
+          await controller.startScreenListener();
         }
       },
       icon: Icon(

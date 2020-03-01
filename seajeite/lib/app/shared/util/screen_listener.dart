@@ -15,9 +15,7 @@ class ScreenListener {
   ScreenListener({
     @required this.notifier,
     @required this.notificationPreference,
-  }) {
-    _startListening();
-  }
+  });
 
   Future<void> onData(ScreenStateEvent event) async {
     if (event == ScreenStateEvent.SCREEN_OFF) {
@@ -35,12 +33,16 @@ class ScreenListener {
     }
   }
 
-  void _startListening() {
+  void startListening() {
     _screen = Screen();
     try {
       _screen.screenStateStream.listen(onData);
     } on ScreenStateException catch (exception) {
       print(exception);
     }
+  }
+
+  void stopListening() {
+    _screen = null;
   }
 }

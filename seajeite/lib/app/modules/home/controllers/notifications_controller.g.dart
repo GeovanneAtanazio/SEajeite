@@ -84,11 +84,11 @@ mixin _$NotificationsController on _NotificationsControllerBase, Store {
   }
 
   @override
-  dynamic setIsLoading() {
+  dynamic setIsLoading(bool newIsLoading) {
     final _$actionInfo =
         _$_NotificationsControllerBaseActionController.startAction();
     try {
-      return super.setIsLoading();
+      return super.setIsLoading(newIsLoading);
     } finally {
       _$_NotificationsControllerBaseActionController.endAction(_$actionInfo);
     }

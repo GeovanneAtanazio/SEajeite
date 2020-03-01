@@ -1,19 +1,27 @@
 import 'package:mobx/mobx.dart';
+import 'package:flutter_modular/flutter_modular.dart';
 
 import 'package:seajeite/app/shared/util/constants.dart';
 import 'package:seajeite/app/shared/util/local_notifier.dart';
 import 'package:seajeite/app/shared/model/notification_model.dart';
 import 'package:seajeite/app/shared/preferences/notification_preference.dart';
+import 'package:seajeite/app/shared/util/screen_listener.dart';
 
 part 'home_controller.g.dart';
 
 class HomeController = _HomeControllerBase with _$HomeController;
 
 abstract class _HomeControllerBase with Store {
-  final LocalNotifier _notifier;
-  final NotificationPreference _notificationPreference;
+  final LocalNotifier _notifier = Modular.get();
+  final NotificationPreference _notificationPreference = Modular.get();
+  ScreenListener _screenListener;
 
-  _HomeControllerBase(this._notifier, this._notificationPreference);
+  _HomeControllerBase() {
+    _screenListener = ScreenListener(
+      notifier: _notifier,
+      notificationPreference: _notificationPreference,
+    );
+  }
 
   @observable
   bool isNotifySet = false;
@@ -39,6 +47,16 @@ abstract class _HomeControllerBase with Store {
       DESCRIPTION_NOTIFY,
     );
     setIsNotifySet(true);
+  }
+
+  Future<void> startScreenListener() async {
+    _screenListener.startListening();
+    await setNotifications();
+  }
+
+  Future<void> stopScreenListener() async {
+    _screenListener.stopListening();
+    await cancelNotifications();
   }
 
   Future<void> cancelNotifications() async {

@@ -1,4 +1,5 @@
 import 'package:mobx/mobx.dart';
+import 'package:flutter_modular/flutter_modular.dart';
 
 import 'package:seajeite/app/shared/model/notification_model.dart';
 import 'package:seajeite/app/shared/preferences/notification_preference.dart';
@@ -10,9 +11,9 @@ class NotificationsController = _NotificationsControllerBase
     with _$NotificationsController;
 
 abstract class _NotificationsControllerBase with Store {
-  final NotificationPreference _notificationPreference;
+  final NotificationPreference _notificationPreference = Modular.get();
 
-  _NotificationsControllerBase(this._notificationPreference) {
+  _NotificationsControllerBase() {
     getNotificationSetting();
   }
 
@@ -27,13 +28,13 @@ abstract class _NotificationsControllerBase with Store {
   setInterval(double newInterval) => interval = newInterval;
 
   @action
-  setIsLoading() => isLoading = !isLoading;
+  setIsLoading(bool newIsLoading) => isLoading = newIsLoading;
 
   @action
   setQtdLimit(double newTimes) => qtdLimit = newTimes;
 
   Future<void> saveNotificationSetting(Function callback) async {
-    setIsLoading();
+    setIsLoading(true);
     if (interval != null && qtdLimit != null) {
       var notificationSettings =
           NotificationModel(interval.toInt(), qtdLimit.toInt());
@@ -44,18 +45,18 @@ abstract class _NotificationsControllerBase with Store {
               : "Erro ao tentar salvar configurações"))
           .catchError((e) => callback("Erro ao tentar salvar configurações"));
     }
-    setIsLoading();
+    setIsLoading(false);
   }
 
   @action
   Future<void> getNotificationSetting() async {
-    setIsLoading();
+    setIsLoading(true);
     var notificationSettings =
         await _notificationPreference.getNotificationSettings();
     if (notificationSettings != null) {
       setInterval(notificationSettings.interval.toDouble());
       setQtdLimit(notificationSettings.qtdLimit.toDouble());
     }
-    setIsLoading();
+    setIsLoading(false);
   }
 }
