@@ -29,7 +29,7 @@ class _HomePageState extends ModularState<HomePage, HomeController> {
               margin: EdgeInsets.only(right: 10),
             ),
             onTap: () {
-              Modular.to.pushNamed(ROUTES.SETTINGS);
+              Modular.to.pushNamed(ROUTES.HOME + ROUTES.SETTINGS);
             },
           ),
         ],

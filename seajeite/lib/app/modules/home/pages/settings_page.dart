@@ -4,7 +4,6 @@ import 'package:flutter_modular/flutter_modular.dart';
 import 'package:seajeite/app/shared/util/routes.dart';
 
 class SettingsPage extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,8 +16,10 @@ class SettingsPage extends StatelessWidget {
       body: Container(
         child: Column(
           children: <Widget>[
-            buildCard("Notificações", ROUTES.NOTIFICATIONS),
-            buildCard("Mensagens", ROUTES.MESSAGES),
+            buildCard(
+              "Notificações",
+              ROUTES.HOME + ROUTES.SETTINGS + ROUTES.NOTIFICATIONS,
+            ),
           ],
         ),
       ),

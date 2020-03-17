@@ -20,9 +20,10 @@ class HomeModule extends ChildModule {
 
   @override
   List<Router> get routers => [
-        Router(ROUTES.HOME, child: (_, args) => HomePage()),
+        Router(ROUTES.ROOT, child: (_, args) => HomePage()),
         Router(ROUTES.SETTINGS, child: (_, args) => SettingsPage()),
-        Router(ROUTES.NOTIFICATIONS, child: (_, args) => NotificationsPage()),
+        Router(ROUTES.SETTINGS + ROUTES.NOTIFICATIONS,
+            child: (_, args) => NotificationsPage()),
       ];
 
   static Inject get to => Inject<HomeModule>.of();

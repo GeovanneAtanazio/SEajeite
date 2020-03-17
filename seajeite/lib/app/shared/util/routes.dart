@@ -1,6 +1,8 @@
 abstract class ROUTES {
-  static const HOME = "/";
+  static const ROOT = "/";
+  static const HOME = "/home";
+  static const LOGIN = "/login";
   static const SETTINGS = "/settings";
-  static const NOTIFICATIONS = "$SETTINGS/notifications";
-  static const MESSAGES = "$SETTINGS/messages";
+  static const NOTIFICATIONS = "/notifications";
+  static const MESSAGES = "/messages";
 }

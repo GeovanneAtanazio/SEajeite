@@ -20,3 +20,6 @@ const DESCRIPTION_NOTIFICATIONS_LIMIT = "Limite de notificações";
 const DESCRIPTION_ACTIVITY_TIME = "TEMPO DE ATIVIDADE";
 const DESCRIPTION_NOTIFY_CHN = "Lembrete de correção postural";
 const DESCRIPTION_NOTIFY = "Arruma essa postura, seu arrombado!";
+
+// Images Path
+const APP_ICON_PATH = "images/app_icon.png";
